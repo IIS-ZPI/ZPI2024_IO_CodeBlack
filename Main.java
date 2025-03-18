@@ -1,4 +1,4 @@
-
+// Interface adding two doubles
 interface IArithmeticsAdd {
     double add(double a, double b);
 }
