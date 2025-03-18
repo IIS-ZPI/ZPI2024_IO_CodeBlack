@@ -26,10 +26,12 @@ public class Main implements IArithmeticDiv,IArithmeticsDiff,IArithmeticsMult,IA
         return a + b;
     }
 
+    //Odejmowanie
     public double Difference(double A, double B){
         return A-B;
     }
 
+    //Dzielenie
     public double division(double a,double b){
         if(b == 0){
             return 0;
