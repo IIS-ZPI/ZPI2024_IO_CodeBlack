@@ -3,10 +3,12 @@ interface IArithmeticsAdd {
     double add(double a, double b);
 }
 
+// Interface multiplying two doubles
 interface IArithmeticsMult{
     double Multiplication(double A, double B);
 }
 
+// Interface differencing two doubles
 interface IArithmeticsDiff{
     double Difference(double A, double B);
 }
