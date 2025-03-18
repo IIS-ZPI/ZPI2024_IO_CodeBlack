@@ -28,7 +28,7 @@ public class Main implements IArithmeticDiv,IArithmeticsDiff,IArithmeticsMult,IA
     public double Difference(double A, double B){
         return A-B;
     }
-  
+    //Comment2
     public double division(double a,double b){
         if(b == 0){
             return 0;
