@@ -36,7 +36,7 @@ public class Main implements IArithmeticDiv,IArithmeticsDiff,IArithmeticsMult,IA
         }
         return a/b;
     }
-    
+    //New Comment Task6
      public double Multiplication(double A, double B) {
         return A * B;
     }
