@@ -25,6 +25,7 @@ public class Main implements IArithmeticDiv,IArithmeticsDiff,IArithmeticsMult,IA
         return a + b;
     }
 
+    // Diff method Daniel Szymczak
     public double Difference(double A, double B){
         return A-B;
     }
