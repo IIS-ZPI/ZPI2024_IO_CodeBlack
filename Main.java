@@ -39,8 +39,5 @@ public class Main implements IArithmeticDiv,IArithmeticsDiff,IArithmeticsMult,IA
      public double Multiplication(double A, double B) {
         return A * B;
     }
-  
-  public double add(double a, double b) {
-        return a + b;
-    }
+
 }
