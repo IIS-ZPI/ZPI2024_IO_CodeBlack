@@ -21,6 +21,7 @@ public class Main implements IArithmeticDiv,IArithmeticsDiff,IArithmeticsMult,IA
         System.out.println("CodeBlack\n Tester/Scrum Master\n albertbrozyna12\nDeveloper\nDanielSzymczak\nDevOps\n kuba122388\nDeveloper\n SzkopikRafal\n");
     }
 
+    // Add method Daniel Szymczak
     public double add(double a, double b) {
         return a + b;
     }
@@ -28,7 +29,7 @@ public class Main implements IArithmeticDiv,IArithmeticsDiff,IArithmeticsMult,IA
     public double Difference(double A, double B){
         return A-B;
     }
-  
+
     public double division(double a,double b){
         if(b == 0){
             return 0;
