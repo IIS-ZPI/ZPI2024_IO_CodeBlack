@@ -3,6 +3,7 @@ interface IArithmeticsAdd {
     double add(double a, double b);
 }
 
+// Interface multiplying two doubles
 interface IArithmeticsMult{
     double Multiplication(double A, double B);
 }
