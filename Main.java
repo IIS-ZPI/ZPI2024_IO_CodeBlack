@@ -13,7 +13,6 @@ interface IArithmeticsDiff{
     double Difference(double A, double B);
 }
 
-// Interface dividing two doubles
 interface IArithmeticDiv{
     double division(double a,double b);
 }
