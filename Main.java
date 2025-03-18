@@ -20,7 +20,7 @@ public class Main implements IArithmeticDiv,IArithmeticsDiff,IArithmeticsMult,IA
     public static  void main(String[] args){
         System.out.println("CodeBlack\n Tester/Scrum Master\n albertbrozyna12\nDeveloper\nDanielSzymczak\nDevOps\n kuba122388\nDeveloper\n SzkopikRafal\n");
     }
-
+    //Comment1
     public double add(double a, double b) {
         return a + b;
     }
