@@ -5,10 +5,10 @@ name: CI pipeline
 
 on:
   push:
-    branches: [ "release", "main", "Develop" ]
+    branches: [ "release", "main", "develop" ]
   
   pull_request:
-    branches: [ "release", "main", "Develop" ]
+    branches: [ "release", "main", "develop" ]
 permissions:
   contents: read
 
