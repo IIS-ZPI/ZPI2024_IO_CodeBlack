@@ -2,9 +2,14 @@ class CurrencyManager:
     def __init__(self):
         pass
 
-    def display_help(self):
-        """Print available commands and their usage"""
-        pass
+    def show_help(self):
+        print("""
+        Available commands:
+        - fetch-data <currency> <start-date> <end-date>
+        - list-currencies
+        - help
+        - export csv
+        """)
 
     def show_available_currencies(self):
         """Display a list of supported currency codes"""
