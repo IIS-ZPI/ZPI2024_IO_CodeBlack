@@ -16,8 +16,10 @@ class CurrencyManager:
         """)
 
     def show_available_currencies(self):
-        """Display a list of supported currency codes"""
-        pass
+        currencies = ["USD", "EUR", "CHF", "GBP", "JPY", "NOK", "SEK"]
+        print("Available currencies:")
+        for c in currencies:
+            print("-", c)
 
     def fetch_data(self, currency: str, start_date: str, end_date: str):
         url = f"https://api.nbp.pl//api//exchangerates//rates//A//{currency}//{start_date}//{end_date}//?format=json"
