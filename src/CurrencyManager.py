@@ -1,3 +1,5 @@
+import csv
+
 class CurrencyManager:
     def __init__(self):
         pass
@@ -15,5 +17,8 @@ class CurrencyManager:
         pass
 
     def export_to_csv(self, data, filename="output.csv"):
-        """Export fetched data to a CSV file"""
-        pass
+        with open(filename, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Date", "Exchange Rate"])
+            writer.writerows(data)
+        print(f"Data exported to {filename}")
