@@ -28,7 +28,6 @@ class CurrencyManager:
         else:
             print("Error fetching data:", response.status_code)
             return []
-        pass
 
     def export_to_csv(self, data, filename="output.csv"):
         with open(filename, mode='w', newline='') as file:
