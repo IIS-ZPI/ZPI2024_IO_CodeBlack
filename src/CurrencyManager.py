@@ -1,4 +1,6 @@
 import csv
+import requests
+
 
 class CurrencyManager:
     def __init__(self):
@@ -18,8 +20,14 @@ class CurrencyManager:
         pass
 
     def fetch_data(self, currency: str, start_date: str, end_date: str):
-        """Fetch currency data from API"""
-        pass
+        url = f"https://api.nbp.pl//api//exchangerates//rates//A//{currency}//{start_date}//{end_date}//?format=json"
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()['rates']
+            return [(entry['effectiveDate'], entry['mid']) for entry in data]
+        else:
+            print("Error fetching data:", response.status_code)
+            return []
 
     def export_to_csv(self, data, filename="output.csv"):
         with open(filename, mode='w', newline='') as file:
