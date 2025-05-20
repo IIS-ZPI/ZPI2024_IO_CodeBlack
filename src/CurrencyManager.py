@@ -1,5 +1,7 @@
 import csv
 import requests
+from datetime import datetime, timedelta
+
 
 
 class CurrencyManager:
@@ -14,6 +16,23 @@ class CurrencyManager:
         - help
         - export csv
         """)
+
+    def get_period_dates(self, period):
+        today = datetime.today()
+        if period == "1w":
+            return today - timedelta(weeks=1), today
+        elif period == "2w":
+            return today - timedelta(weeks=2), today
+        elif period == "1m":
+            return today - timedelta(days=30), today
+        elif period == "1q":
+            return today - timedelta(days=90), today
+        elif period == "6m":
+            return today - timedelta(days=180), today
+        elif period == "1y":
+            return today - timedelta(days=365), today
+        else:
+            raise ValueError("Invalid period")
 
     def show_available_currencies(self):
         print("Available currencies:")

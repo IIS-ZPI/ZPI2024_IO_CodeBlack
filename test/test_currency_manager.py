@@ -1,7 +1,8 @@
 import sys
 import os
 import unittest
-from unittest.mock import mock_open, patch
+from datetime import datetime, timedelta
+from unittest.mock import mock_open
 from io import StringIO
 from unittest.mock import patch
 from contextlib import redirect_stdout
@@ -9,6 +10,11 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from src.CurrencyManager import CurrencyManager
 
 class TestCurrencyManager(unittest.TestCase):
+    def setUp(self):
+        self.today = datetime.today().replace(microsecond=0)
+        self.delta = timedelta(seconds=5)
+        self.cm = CurrencyManager()
+
     def test_show_help_output(self):
         cm = CurrencyManager()
         buffer = StringIO()
@@ -50,6 +56,51 @@ class TestCurrencyManager(unittest.TestCase):
             mock_writer.writerows.assert_called_once_with(data)
 
             mock_print.assert_called_once_with("Data exported to test.csv")
+
+    def compare_dates(self, result_start, result_end, expected_start, expected_end):
+        self.assertAlmostEqual(result_start.timestamp(), expected_start.timestamp(), delta=self.delta.total_seconds())
+        self.assertAlmostEqual(result_end.timestamp(), expected_end.timestamp(), delta=self.delta.total_seconds())
+
+    def test_1w(self):
+        expected_start = self.today - timedelta(weeks=1)
+        expected_end = self.today
+        result_start, result_end = self.cm.get_period_dates("1w")
+        self.compare_dates(result_start, result_end, expected_start, expected_end)
+
+    def test_2w(self):
+        expected_start = self.today - timedelta(weeks=2)
+        expected_end = self.today
+        result_start, result_end = self.cm.get_period_dates("2w")
+        self.compare_dates(result_start, result_end, expected_start, expected_end)
+
+    def test_1m(self):
+        expected_start = self.today - timedelta(days=30)
+        expected_end = self.today
+        result_start, result_end = self.cm.get_period_dates("1m")
+        self.compare_dates(result_start, result_end, expected_start, expected_end)
+
+    def test_1q(self):
+        expected_start = self.today - timedelta(days=90)
+        expected_end = self.today
+        result_start, result_end = self.cm.get_period_dates("1q")
+        self.compare_dates(result_start, result_end, expected_start, expected_end)
+
+    def test_6m(self):
+        expected_start = self.today - timedelta(days=180)
+        expected_end = self.today
+        result_start, result_end = self.cm.get_period_dates("6m")
+        self.compare_dates(result_start, result_end, expected_start, expected_end)
+
+    def test_1y(self):
+        expected_start = self.today - timedelta(days=365)
+        expected_end = self.today
+        result_start, result_end = self.cm.get_period_dates("1y")
+        self.compare_dates(result_start, result_end, expected_start, expected_end)
+
+    def test_invalid_period(self):
+        with self.assertRaises(ValueError):
+            self.cm.get_period_dates("invalid")
+
 
 if __name__ == '__main__':
     unittest.main()
