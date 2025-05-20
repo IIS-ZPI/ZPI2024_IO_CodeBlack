@@ -1,7 +1,11 @@
+import sys
+import os
 import unittest
 from io import StringIO
 from contextlib import redirect_stdout
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.CurrencyManager import CurrencyManager
+
 
 class TestCurrencyManager(unittest.TestCase):
     def test_show_help_output(self):
