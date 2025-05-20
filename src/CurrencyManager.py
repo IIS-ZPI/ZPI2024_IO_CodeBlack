@@ -1,4 +1,6 @@
 import csv
+from statistics import median, mode, stdev
+
 import requests
 from datetime import datetime, timedelta
 
@@ -67,3 +69,14 @@ class CurrencyManager:
             else:
                 trends["stable"] += 1
         return trends
+
+    def compute_statistics(self, data):
+        values = [x[1] for x in data]
+        if len(values) < 2:
+            return {}
+        return {
+            "median": median(values),
+            "mode": mode(values),
+            "std_dev": stdev(values),
+            "cv": round(stdev(values) / (sum(values) / len(values)) * 100, 2)
+        }
