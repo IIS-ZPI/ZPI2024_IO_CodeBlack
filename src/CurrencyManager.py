@@ -1,8 +1,7 @@
 import csv
 import requests
 from datetime import datetime, timedelta
-
-
+from matplotlib import pyplot as plt
 
 class CurrencyManager:
     def __init__(self):
@@ -67,3 +66,13 @@ class CurrencyManager:
             else:
                 trends["stable"] += 1
         return trends
+
+    def generate_histogram(self, data, title="Histogram"):
+        values = [x[1] for x in data]
+        plt.hist(values, bins=10, edgecolor='black')
+        plt.title(title)
+        plt.xlabel("Exchange Rate")
+        plt.ylabel("Frequency")
+        plt.grid(True)
+        plt.savefig("histogram.png")
+        plt.show()
