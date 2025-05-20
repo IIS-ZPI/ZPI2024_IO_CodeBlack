@@ -4,7 +4,7 @@ import requests
 
 class CurrencyManager:
     def __init__(self):
-        pass
+        self.currencies = ["USD", "EUR", "CHF", "GBP", "JPY", "NOK", "SEK"]
 
     def show_help(self):
         print("""
@@ -16,9 +16,8 @@ class CurrencyManager:
         """)
 
     def show_available_currencies(self):
-        currencies = ["USD", "EUR", "CHF", "GBP", "JPY", "NOK", "SEK"]
         print("Available currencies:")
-        for c in currencies:
+        for c in self.currencies:
             print("-", c)
 
     def fetch_data(self, currency: str, start_date: str, end_date: str):
