@@ -159,6 +159,7 @@ class TestCurrencyManager(unittest.TestCase):
         self.assertIsInstance(data, list, "Expected result to be a list")
         self.assertEqual(data, [], "Expected empty list when end date is before start date")
 
+
     def test_compute_statistics_typical_data(self):
         data = [("2023-01-01", 11), ("2023-01-02", 12), ("2023-01-03", 14), ("2023-01-04", 12)]
         result = self.cm.compute_statistics(data)
@@ -192,7 +193,15 @@ class TestCurrencyManager(unittest.TestCase):
         self.assertEqual(result["mode"], 4.5)
         self.assertAlmostEqual(result["std_dev"], 1.0)
         self.assertGreater(result["cv"], 0)
+        
+    @patch("matplotlib.pyplot.savefig")
+    @patch("matplotlib.pyplot.show")
+    def test_generate_histogram(self, mock_show, mock_savefig):
+        data = [("2023-01-01", 4.5), ("2023-01-02", 4.6), ("2023-01-03", 4.7)]
+        self.cm.generate_histogram(data, title="Test Histogram")
 
+        mock_savefig.assert_called_once_with("histogram.png")
+        mock_show.assert_called_once()
 
 if __name__ == '__main__':
     unittest.main()

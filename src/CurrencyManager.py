@@ -3,8 +3,7 @@ from statistics import median, mode, stdev
 
 import requests
 from datetime import datetime, timedelta
-
-
+from matplotlib import pyplot as plt
 
 class CurrencyManager:
     def __init__(self):
@@ -80,3 +79,13 @@ class CurrencyManager:
             "std_dev": stdev(values),
             "cv": round(stdev(values) / (sum(values) / len(values)) * 100, 2)
         }
+
+    def generate_histogram(self, data, title="Histogram"):
+        values = [x[1] for x in data]
+        plt.hist(values, bins=10, edgecolor='black')
+        plt.title(title)
+        plt.xlabel("Exchange Rate")
+        plt.ylabel("Frequency")
+        plt.grid(True)
+        plt.savefig("histogram.png")
+        plt.show()
