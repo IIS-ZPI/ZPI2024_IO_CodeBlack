@@ -55,3 +55,15 @@ class CurrencyManager:
             writer.writerow(["Date", "Exchange Rate"])
             writer.writerows(data)
         print(f"Data exported to {filename}")
+
+    def session_analysis(self, data):
+        trends = {"up": 0, "down": 0, "stable": 0}
+        for i in range(1, len(data)):
+            diff = round(data[i][1] - data[i-1][1], 4)
+            if diff > 0:
+                trends["up"] += 1
+            elif diff < 0:
+                trends["down"] += 1
+            else:
+                trends["stable"] += 1
+        return trends

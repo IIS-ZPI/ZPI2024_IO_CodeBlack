@@ -101,6 +101,35 @@ class TestCurrencyManager(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.cm.get_period_dates("invalid")
 
+    def test_all_up(self):
+        data = [(1, 100), (2, 105), (3, 110)]
+        expected = {"up": 2, "down": 0, "stable": 0}
+        self.assertEqual(self.cm.session_analysis(data), expected)
+
+    def test_all_down(self):
+        data = [(1, 100), (2, 95), (3, 90)]
+        expected = {"up": 0, "down": 2, "stable": 0}
+        self.assertEqual(self.cm.session_analysis(data), expected)
+
+    def test_all_stable(self):
+        data = [(1, 100), (2, 100), (3, 100)]
+        expected = {"up": 0, "down": 0, "stable": 2}
+        self.assertEqual(self.cm.session_analysis(data), expected)
+
+    def test_mixed_trends(self):
+        data = [(1, 100), (2, 105), (3, 105), (4, 100)]
+        expected = {"up": 1, "down": 1, "stable": 1}
+        self.assertEqual(self.cm.session_analysis(data), expected)
+
+    def test_single_element(self):
+        data = [(1, 100)]
+        expected = {"up": 0, "down": 0, "stable": 0}
+        self.assertEqual(self.cm.session_analysis(data), expected)
+
+    def test_empty_data(self):
+        data = []
+        expected = {"up": 0, "down": 0, "stable": 0}
+        self.assertEqual(self.cm.session_analysis(data), expected)
 
 if __name__ == '__main__':
     unittest.main()
