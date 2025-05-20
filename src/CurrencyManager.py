@@ -88,6 +88,7 @@ class CurrencyManager:
                 trends["stable"] += 1
         return trends
 
+
     def compute_statistics(self, data):
         values = [x[1] for x in data]
         if len(values) < 2:
