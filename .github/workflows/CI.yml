@@ -5,7 +5,7 @@ name: CI pipeline
 
 on:
   push:
-    branches: [ "release", "main", "develop" ]
+    branches: [ "release", "main", "develop", "feature/**" ]
   
   pull_request:
     branches: [ "release", "main", "develop" ]
