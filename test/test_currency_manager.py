@@ -140,19 +140,21 @@ class TestCurrencyManager(unittest.TestCase):
         self.assertIsInstance(data[0][0], str, "Expected first element of tuple to be a string (date)")
         self.assertIsInstance(data[0][1], (float, int),"Expected second element of tuple to be a number (exchange rate)")
 
+        data = self.cm.fetch_data('USD', '2020-01-01', '2023-01-10')
+        self.assertEqual(len(data), 767, f"Expected 767 record. Got: {len(data)}")
+
+
     def test_fetch_data_invalid_currency(self):
         data = self.cm.fetch_data('U5D', '2023-01-01', '2023-01-10')
 
         self.assertIsInstance(data, list, "Expected result to be a list")
-        # For an invalid currency code, the returned list should be empty
         self.assertEqual(data, [], "Expected empty list for invalid currency code")
 
     def test_fetch_data_invalid_dates(self):
 
         # Test with invalid start date format
-        data = self.cm.fetch_data('USD', '2023-13-01', '2023-01-10')
-        self.assertIsInstance(data, list, "Expected result to be a list")
-        self.assertEqual(data, [], "Expected empty list for invalid start date format")
+        with self.assertRaises(ValueError):
+            self.cm.fetch_data('USD', '2023-13-01', '2023-01-10')
 
         # Test with end date earlier than start date
         data = self.cm.fetch_data('USD', '2023-01-10', '2023-01-01')

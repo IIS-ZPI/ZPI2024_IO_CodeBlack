@@ -41,14 +41,33 @@ class CurrencyManager:
             print("-", c)
 
     def fetch_data(self, currency: str, start_date: str, end_date: str):
-        url = f"https://api.nbp.pl//api//exchangerates//rates//A//{currency}//{start_date}//{end_date}//?format=json"
-        response = requests.get(url)
-        if response.status_code == 200:
-            data = response.json()['rates']
-            return [(entry['effectiveDate'], entry['mid']) for entry in data]
-        else:
-            print("Error fetching data:", response.status_code)
+        max_days = 93
+        try:
+            start = datetime.strptime(start_date, "%Y-%m-%d")
+            end = datetime.strptime(end_date, "%Y-%m-%d")
+        except ValueError:
+            raise ValueError("Invalid start date or end date")
+
+        if start > end:
             return []
+
+        all_data = []
+        current_start = start
+
+        while current_start <= end:
+            current_end = min(current_start + timedelta(days=max_days - 1), end)
+            url = f"https://api.nbp.pl/api/exchangerates/rates/A/{currency}/{current_start.strftime('%Y-%m-%d')}/{current_end.strftime('%Y-%m-%d')}?format=json"
+            response = requests.get(url)
+
+            if response.status_code == 200:
+                data = response.json().get('rates', [])
+                all_data.extend([(entry['effectiveDate'], entry['mid']) for entry in data])
+            else:
+                print(f"Error fetching data for {current_start.strftime('%Y-%m-%d')} to {current_end.strftime('%Y-%m-%d')}: {response.status_code}")
+
+            current_start = current_end + timedelta(days=1)
+
+        return all_data
 
     def export_to_csv(self, data, filename="output.csv"):
         with open(filename, mode='w', newline='') as file:
