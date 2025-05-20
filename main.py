@@ -17,9 +17,14 @@ def main():
             currency = input("Currency (e.g. USD): ").strip().upper()
             start = input("Start date (YYYY-MM-DD): ").strip()
             end = input("End date (YYYY-MM-DD): ").strip()
-            data = cm.fetch_data(currency, start, end)
-            for row in data:
-                print(row)
+            try:
+                data = cm.fetch_data(currency, start, end)
+
+                for row in data:
+                    print(row)
+            except ValueError as e:
+                print(str(e))
+
 
         elif command == "session-analysis":
             currency = input("Currency (e.g. EUR): ").strip().upper()
