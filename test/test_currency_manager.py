@@ -16,11 +16,10 @@ class TestCurrencyManager(unittest.TestCase):
         self.cm = CurrencyManager()
 
     def test_show_help_output(self):
-        cm = CurrencyManager()
         buffer = StringIO()
 
         with redirect_stdout(buffer):
-            cm.show_help()
+            self.cm.show_help()
 
         output = buffer.getvalue()
 
@@ -31,15 +30,13 @@ class TestCurrencyManager(unittest.TestCase):
         self.assertIn("export csv", output)
 
     def test_show_available_currencies_output(self):
-        cm = CurrencyManager()
         expected_output = "Available currencies:\n- USD\n- EUR\n- CHF\n- GBP\n- JPY\n- NOK\n- SEK\n"
 
         with patch('sys.stdout', new=StringIO()) as fake_out:
-            cm.show_available_currencies()
+            self.cm.show_available_currencies()
             assert fake_out.getvalue() == expected_output
 
     def test_export_to_csv(self):
-        exporter = CurrencyManager()
         data = [["2023-01-01", 4.5], ["2023-01-02", 4.6]]
         mock_file = mock_open()
 
@@ -48,7 +45,7 @@ class TestCurrencyManager(unittest.TestCase):
              patch("builtins.print") as mock_print:
 
             mock_writer = mock_writer_class.return_value
-            exporter.export_to_csv(data, "test.csv")
+            self.cm.export_to_csv(data, "test.csv")
 
             mock_file.assert_called_once_with("test.csv", mode='w', newline='')
 
@@ -130,6 +127,37 @@ class TestCurrencyManager(unittest.TestCase):
         data = []
         expected = {"up": 0, "down": 0, "stable": 0}
         self.assertEqual(self.cm.session_analysis(data), expected)
+
+    def test_fetch_data_returns_data(self):
+        data = self.cm.fetch_data('USD', '2023-01-01', '2023-01-10')
+
+        self.assertIsInstance(data, list, "Expected result to be a list")
+        self.assertEqual(len(data), 6, "Expected 6 data points for the date range")
+        for i, entry in enumerate(data):
+            with self.subTest(i=i):
+                self.assertIsInstance(entry, tuple, f"Entry {i} is not a tuple")
+        self.assertEqual(len(data[0]), 2, "Expected tuple to have exactly 2 elements")
+        self.assertIsInstance(data[0][0], str, "Expected first element of tuple to be a string (date)")
+        self.assertIsInstance(data[0][1], (float, int),"Expected second element of tuple to be a number (exchange rate)")
+
+    def test_fetch_data_invalid_currency(self):
+        data = self.cm.fetch_data('U5D', '2023-01-01', '2023-01-10')
+
+        self.assertIsInstance(data, list, "Expected result to be a list")
+        # For an invalid currency code, the returned list should be empty
+        self.assertEqual(data, [], "Expected empty list for invalid currency code")
+
+    def test_fetch_data_invalid_dates(self):
+
+        # Test with invalid start date format
+        data = self.cm.fetch_data('USD', '2023-13-01', '2023-01-10')
+        self.assertIsInstance(data, list, "Expected result to be a list")
+        self.assertEqual(data, [], "Expected empty list for invalid start date format")
+
+        # Test with end date earlier than start date
+        data = self.cm.fetch_data('USD', '2023-01-10', '2023-01-01')
+        self.assertIsInstance(data, list, "Expected result to be a list")
+        self.assertEqual(data, [], "Expected empty list when end date is before start date")
 
 if __name__ == '__main__':
     unittest.main()
