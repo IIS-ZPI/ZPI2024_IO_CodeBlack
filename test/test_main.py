@@ -4,6 +4,7 @@ from unittest.mock import patch, MagicMock
 from src.CurrencyManager import CurrencyManager
 from datetime import datetime
 
+
 class TestCurrencyManager(unittest.TestCase):
 
     def setUp(self):
@@ -27,7 +28,6 @@ class TestCurrencyManager(unittest.TestCase):
 
         for call in expected_calls:
             self.assertIn(call, mock_print.mock_calls)
-
 
     # Test fetch data
     @patch("builtins.print")
@@ -80,6 +80,56 @@ class TestCurrencyManager(unittest.TestCase):
         printed_args = [call.args[0] for call in mock_print.call_args_list]
 
         self.assertIn("Invalid start date or end date", printed_args)
+
+
+    @patch("builtins.print")
+    @patch("builtins.input", side_effect=[
+        "export",
+        "csv",
+        "USD",
+        "2020-01-01",
+        "2020-01-10",
+        "exit"
+    ])
+    def test_valid_csv_export(self, mock_input, mock_print):
+        from main import main
+        main()
+
+        printed_args = [call.args[0] for call in mock_print.call_args_list]
+
+        self.assertIn("Data exported to output.csv", printed_args)
+
+        results = [
+            ('Date', 'Exchange Rate'),
+            ('2020-01-02', 3.8),
+            ('2020-01-03', 3.8213),
+            ('2020-01-07', 3.7861),
+            ('2020-01-08', 3.8123),
+            ('2020-01-09', 3.8251),
+            ('2020-01-10', 3.8272)]
+
+        with open("output.csv", "r") as file:
+            first_line = file.readline().strip()
+            self.assertEqual(first_line, ",".join(results[0]))
+
+            for i, line in enumerate(file):
+                with self.subTest(i=i):
+                    expected = ",".join(map(str,results[i+1]))
+                    self.assertEqual(line.rstrip("\n"), expected)
+
+    @patch("builtins.print")
+    @patch("builtins.input", side_effect=[
+        "export",
+        "wrongInput",
+        "exit"
+    ])
+    def test_invalid_export_type(self, mock_input, mock_print):
+        from main import main
+        main()
+
+        printed_args = [call.args[0] for call in mock_print.call_args_list]
+
+        self.assertIn("Unsupported export format.", printed_args)
 
 class TestMainFlow(unittest.TestCase):
     @patch("builtins.input", side_effect=["list-currencies", "exit"])
