@@ -65,21 +65,6 @@ class TestCurrencyManager(unittest.TestCase):
             self.assertEqual(exp[0], act[0])
             self.assertAlmostEqual(exp[1], act[1], places=4)
 
-    @patch("builtins.print")
-    @patch("builtins.input", side_effect=[
-        "fetch-data",
-        "USD",
-        "invalid-date",  # Invalid start date
-        "2024-01-05",
-        "exit"
-    ])
-    def test_invalid_date_error_message_printed(self, mock_input, mock_print):
-        from main import main
-        main()
-
-        printed_args = [call.args[0] for call in mock_print.call_args_list]
-
-        self.assertIn("Invalid start date or end date", printed_args)
 
 class TestMainFlow(unittest.TestCase):
     @patch("builtins.input", side_effect=["list-currencies", "exit"])

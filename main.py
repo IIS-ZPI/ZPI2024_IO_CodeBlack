@@ -1,6 +1,5 @@
 from src.CurrencyManager import CurrencyManager
 from datetime import datetime, timedelta
-
 def get_valid_date(prompt: str) -> str:
     while True:
         date_input = input(f"{prompt} (YYYY-MM-DD): ").strip()
@@ -19,6 +18,17 @@ def get_valid_currency(cm) -> str:
         print("Available currencies:")
         cm.show_available_currencies()
 
+def get_valid_currency_pair(cm) -> tuple[str, str]:
+    while True:
+        pair = input("Currency pair (e.g. USD/EUR): ").strip().upper()
+        if '/' not in pair:
+            print("Invalid format. Use USD/EUR.")
+            continue
+        base, quote = pair.split('/')
+        if base in cm.currencies and quote in cm.currencies:
+            return base, quote
+        print("Invalid currencies. Available currencies:")
+        cm.show_available_currencies()
 
 def main():
     cm = CurrencyManager()
@@ -73,30 +83,40 @@ def main():
             else:
                 print("Unsupported export format.")
 
+
         elif command == "change-histogram":
-            pair = input("Currency pair (e.g. USD/EUR): ").strip().upper()
-            if '/' not in pair:
-                print("Invalid format. Use USD/EUR.")
+            base, quote = get_valid_currency_pair(cm)
+            period = input("Period (1m or 1q): ").strip().lower()
+
+            if period not in ["1m", "1q"]:
+                print("Invalid period. Use '1m' for one month or '1q' for one quarter.")
                 continue
-            base, quote = pair.split('/')
-            period = input("Period (1m or 1q): ").strip()
-            start_str = input("Start date (YYYY-MM-DD): ").strip()
+
+            start_date = get_valid_date("Start date")
             try:
-                start_date = datetime.strptime(start_str, "%Y-%m-%d")
+                start_date = datetime.strptime(start_date, "%Y-%m-%d")
             except ValueError:
                 print("Invalid date format.")
                 continue
-            end = start_date + timedelta(days=30 if period == "1m" else 90)
-            base_data = cm.fetch_data(base, start_date.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
-            quote_data = cm.fetch_data(quote, start_date.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
+            end_date = start_date + timedelta(days=30 if period == "1m" else 90)
+
+            try:
+                base_data = cm.fetch_data(base, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"))
+                quote_data = cm.fetch_data(quote, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"))
+            except ValueError as e:
+                print(f"Data fetch error: {e}")
+                continue
+
             if len(base_data) != len(quote_data):
                 print("Mismatch in data length. Cannot build histogram.")
                 continue
+
             rel_data = []
             for i in range(len(base_data)):
                 date = base_data[i][0]
                 rate = base_data[i][1] / quote_data[i][1]
                 rel_data.append((date, rate))
+
             cm.generate_histogram(rel_data, f"{base}/{quote} Histogram")
 
         elif command == "help":
