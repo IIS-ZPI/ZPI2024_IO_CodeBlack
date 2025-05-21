@@ -12,10 +12,14 @@ class CurrencyManager:
     def show_help(self):
         print("""
         Available commands:
-        - fetch-data <currency> <start-date> <end-date>
+        - fetch-data
         - list-currencies
         - help
-        - export csv
+        - export
+        - session-analysis
+        - statistics
+        - change-histogram
+        - exit
         """)
 
     def get_period_dates(self, period):
