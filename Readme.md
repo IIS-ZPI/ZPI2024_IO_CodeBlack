@@ -6,7 +6,7 @@ This project uses **GitHub Actions** to implement Continuous Integration (CI) an
 
 The pipeline runs automatically on:
 
-- Pushes to: `main`, `release`, `develop`
+- Pushes to: `main`, `release`, `develop`, `feature/**`
 - Pull requests targeting: `main`, `release`, `develop`
 
 ##  Workflow Overview
@@ -27,7 +27,7 @@ The CI/CD process is defined in `.github/workflows/ci.yml`. It consists of two m
 
 3. **Install dependencies**
    - Upgrade `pip`
-   - Install `flake8` and `pytest`
+   - Install `flake8` `pytest` and `requests` dependencies
    - Install packages listed in `requirements.txt` if it exists
 
 4. **Linting with flake8**
