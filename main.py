@@ -17,15 +17,19 @@ def get_valid_currency(cm) -> str:
         print("Invalid currency.")
         cm.show_available_currencies()
 
+
 def get_valid_currency_pair(cm) -> tuple[str, str]:
     while True:
         pair = input("Currency pair (e.g. USD/EUR): ").strip().upper()
-        if '/' not in pair:
-            print("Invalid format. Use USD/EUR.")
+
+        if pair.count('/') != 1:
+            print("Invalid format. Use exactly one '/' like USD/EUR.")
             continue
+
         base, quote = pair.split('/')
         if base in cm.currencies and quote in cm.currencies:
             return base, quote
+
         print("Invalid currencies. Available currencies:")
         cm.show_available_currencies()
 
@@ -39,6 +43,7 @@ def get_valid_currency_and_period(cm):
             return currency, start, end
         except ValueError:
             print("Invalid period. Valid options: 1w, 2w, 1m, 1q, 6m, 1y")
+
 
 def main():
     cm = CurrencyManager()
@@ -91,11 +96,12 @@ def main():
 
         elif command == "change-histogram":
             base, quote = get_valid_currency_pair(cm)
-            period = input("Period (1m or 1q): ").strip().lower()
-
-            if period not in ["1m", "1q"]:
-                print("Invalid period. Use '1m' for one month or '1q' for one quarter.")
-                continue
+            while True:
+                period = input("Period (1m or 1q): ").strip().lower()
+                if period not in ["1m", "1q"]:
+                    print("Invalid period. Use '1m' for one month or '1q' for one quarter.")
+                    continue
+                break
 
             start_date = get_valid_date("Start date")
             try:
