@@ -27,7 +27,11 @@ class TestCurrencyManager(unittest.TestCase):
         self.assertIn("fetch-data", output)
         self.assertIn("list-currencies", output)
         self.assertIn("help", output)
-        self.assertIn("export csv", output)
+        self.assertIn("export", output)
+        self.assertIn("session-analysis", output)
+        self.assertIn("statistics", output)
+        self.assertIn("change-histogram", output)
+        self.assertIn("exit", output)
 
     def test_show_available_currencies_output(self):
         expected_output = "Available currencies:\n- USD\n- EUR\n- CHF\n- GBP\n- JPY\n- NOK\n- SEK\n"
