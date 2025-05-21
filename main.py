@@ -1,5 +1,25 @@
 from src.CurrencyManager import CurrencyManager
 from datetime import datetime, timedelta
+from datetime import datetime
+
+def get_valid_date(prompt: str) -> str:
+    while True:
+        date_input = input(f"{prompt} (YYYY-MM-DD): ").strip()
+        try:
+            datetime.strptime(date_input, "%Y-%m-%d")
+            return date_input
+        except ValueError:
+            print("Invalid date format or date. Please use YYYY-MM-DD.")
+
+def get_valid_currency(cm) -> str:
+    while True:
+        currency = input("Currency (e.g. USD): ").strip().upper()
+        if currency in cm.currencies:
+            return currency
+        print("Invalid currency.")
+        print("Available currencies:")
+        cm.show_available_currencies()
+
 
 def main():
     cm = CurrencyManager()
@@ -13,18 +33,18 @@ def main():
         elif command == "list-currencies":
             cm.show_available_currencies()
 
-        elif command == "fetch-data":
-            currency = input("Currency (e.g. USD): ").strip().upper()
-            start = input("Start date (YYYY-MM-DD): ").strip()
-            end = input("End date (YYYY-MM-DD): ").strip()
-            try:
-                data = cm.fetch_data(currency, start, end)
 
+        elif command == "fetch-data":
+            currency = get_valid_currency(cm)
+            start_date = get_valid_date("Start date")
+            end_date = get_valid_date("End date")
+
+            try:
+                data = cm.fetch_data(currency, start_date, end_date)
                 for row in data:
                     print(row)
             except ValueError as e:
-                print(str(e))
-
+                print(f"Error fetching data: {e}")
 
         elif command == "session-analysis":
             currency = input("Currency (e.g. EUR): ").strip().upper()
