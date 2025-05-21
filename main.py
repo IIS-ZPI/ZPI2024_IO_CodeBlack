@@ -1,6 +1,5 @@
 from src.CurrencyManager import CurrencyManager
 from datetime import datetime, timedelta
-from datetime import datetime
 
 def get_valid_date(prompt: str) -> str:
     while True:
