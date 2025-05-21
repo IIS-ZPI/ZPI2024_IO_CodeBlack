@@ -15,7 +15,6 @@ def get_valid_currency(cm) -> str:
         if currency in cm.currencies:
             return currency
         print("Invalid currency.")
-        print("Available currencies:")
         cm.show_available_currencies()
 
 def get_valid_currency_pair(cm) -> tuple[str, str]:
@@ -30,6 +29,17 @@ def get_valid_currency_pair(cm) -> tuple[str, str]:
         print("Invalid currencies. Available currencies:")
         cm.show_available_currencies()
 
+def get_valid_currency_and_period(cm):
+    currency = get_valid_currency(cm)
+
+    while True:
+        period = input("Period (1w, 2w, 1m, 1q, 6m, 1y): ").strip()
+        try:
+            start, end = cm.get_period_dates(period)
+            return currency, start, end
+        except ValueError:
+            print("Invalid period. Valid options: 1w, 2w, 1m, 1q, 6m, 1y")
+
 def main():
     cm = CurrencyManager()
     while True:
@@ -41,7 +51,6 @@ def main():
 
         elif command == "list-currencies":
             cm.show_available_currencies()
-
 
         elif command == "fetch-data":
             currency = get_valid_currency(cm)
@@ -56,17 +65,13 @@ def main():
                 print(f"Error fetching data: {e}")
 
         elif command == "session-analysis":
-            currency = input("Currency (e.g. EUR): ").strip().upper()
-            period = input("Period (1w, 2w, 1m, 1q, 6m, 1y): ").strip()
-            start, end = cm.get_period_dates(period)
+            currency, start, end = get_valid_currency_and_period(cm)
             data = cm.fetch_data(currency, start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
             trends = cm.session_analysis(data)
             print(f"Up: {trends['up']}, Down: {trends['down']}, Stable: {trends['stable']}")
 
         elif command == "statistics":
-            currency = input("Currency (e.g. CHF): ").strip().upper()
-            period = input("Period (1w, 2w, 1m, 1q, 6m, 1y): ").strip()
-            start, end = cm.get_period_dates(period)
+            currency, start, end = get_valid_currency_and_period(cm)
             data = cm.fetch_data(currency, start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
             stats = cm.compute_statistics(data)
             for k, v in stats.items():
