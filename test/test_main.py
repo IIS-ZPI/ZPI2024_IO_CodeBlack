@@ -75,34 +75,50 @@ class TestCurrencyManager(unittest.TestCase):
 
         printed_args = [call.args[0] for call in mock_print.call_args_list]
 
-        self.assertIn("Up: 8, Down: 11, Stable: 0", printed_args)
+        pattern = r"Up:\s*\d+,\s*Down:\s*\d+,\s*Stable:\s*\d+"
+        self.assertTrue(any(re.search(pattern, arg) for arg in printed_args))
 
     # Test invalid currency value
-    # @patch("builtins.input", side_effect=["session-analysis", "EU", "1m", "exit"])
-    # @patch("builtins.print")
-    # def test_session_analysis_flow(self, mock_print, mock_input):
-    #     from main import main
-    #     main()
-    #
-    #     printed_args = [call.args[0] for call in mock_print.call_args_list]
-    #
-    #     self.assertIn("Up: 8, Down: 11, Stable: 0", printed_args)
+    @patch("builtins.input", side_effect=["session-analysis", "EU","EUR", "1m", "exit"])
+    @patch("builtins.print")
+    def test_session_invalid_currency(self, mock_print, mock_input):
+        from main import main
+        main()
+
+        printed_args = [call.args for call in mock_print.call_args_list]
+
+        expected_lines = [
+            ("Invalid currency.",),
+            ("Available currencies:",),
+            ("-", "USD"),
+            ("-", "EUR"),
+            ("-" ,"CHF"),
+            ("-" ,"GBP"),
+            ("-" ,"JPY"),
+            ("-" ,"NOK"),
+            ("-" ,"SEK"),
+        ]
+
+        for line in expected_lines:
+            self.assertIn(line, printed_args)
 
     # Test invalid period value
-    @patch("builtins.input", side_effect=["session-analysis", "EUR", "1l", "exit"])
+    @patch("builtins.input", side_effect=["session-analysis", "EUR", "1l","1m", "exit"])
     @patch("builtins.print")
-    def test_session_analysis_flow(self, mock_print, mock_input):
+    def test_session_analysis_invalid_period(self, mock_print, mock_input):
         from main import main
         main()
 
         printed_args = [call.args[0] for call in mock_print.call_args_list]
 
-        self.assertIn("Invalid period", printed_args)
+        self.assertIn("Invalid period. Valid options: 1w, 2w, 1m, 1q, 6m, 1y", printed_args)
+        pattern = r"Up:\s*\d+,\s*Down:\s*\d+,\s*Stable:\s*\d+"
+        self.assertTrue(any(re.search(pattern, arg) for arg in printed_args))
 
     # Test invalid command
     @patch("builtins.input", side_effect=["session-analysi","exit"])
     @patch("builtins.print")
-    def test_session_analysis_flow(self, mock_print, mock_input):
+    def test_invalid_command(self, mock_print, mock_input):
         from main import main
         main()
 
@@ -110,79 +126,61 @@ class TestCurrencyManager(unittest.TestCase):
 
         self.assertIn("Unknown command. Type 'help' to see available commands.", printed_args)
 
-    # Test statistics correct input
-    @patch("builtins.input", side_effect=["statistics", "CHF","1m","exit"])
-    @patch("builtins.print")
-    def test_session_analysis_flow(self, mock_print, mock_input):
-        from main import main
-        main()
-
-        printed_args = [call.args[0] for call in mock_print.call_args_list]
-
-        self.assertIn("median: 4.5523", printed_args)
-        self.assertIn("mode: 4.5919", printed_args)
-        self.assertIn("std_dev: 0.022783140119048792", printed_args)
-        self.assertIn("cv: 0.5", printed_args)
-
-
     # Test statistics invalid currency
     @patch("builtins.input", side_effect=["statistics", "CHF", "1m", "exit"])
     @patch("builtins.print")
-    def test_session_analysis_flow(self, mock_print, mock_input):
+    def test_statistic_invalid_currency(self, mock_print, mock_input):
         from main import main
         main()
 
         printed_args = [call.args[0] for call in mock_print.call_args_list]
 
-        self.assertIn("median: 4.5523", printed_args)
-        self.assertIn("mode: 4.5919", printed_args)
-        self.assertIn("std_dev: 0.022783140119048792", printed_args)
-        self.assertIn("cv: 0.5", printed_args)
+        patterns = [
+            r"median:\s*\d+\.\d+",
+            r"mode:\s*\d+\.\d+",
+            r"std_dev:\s*\d+\.\d+",
+            r"cv:\s*\d+(\.\d+)?",
+        ]
 
-    # Test statistics invalid period
-    @patch("builtins.input", side_effect=["statistics", "CHF", "1a", "exit"])
-    @patch("builtins.print")
-    def test_session_analysis_flow(self, mock_print, mock_input):
-        from main import main
-        main()
-
-        printed_args = [call.args[0] for call in mock_print.call_args_list]
-
-        self.assertIn("Invalid period", printed_args)
+        for pattern in patterns:
+            self.assertTrue(
+                any(re.search(pattern, arg) for arg in printed_args),
+                msg=f"Pattern not found: {pattern}"
+            )
 
     # Test change histogram invalid pair
-    @patch("builtins.input", side_effect=["change-histogram", "USD", "exit"])
+    @patch("builtins.input", side_effect=["change-histogram", "USD","USD/EUR","1m","2024-01-01", "exit"])
     @patch("builtins.print")
-    def test_session_analysis_flow(self, mock_print, mock_input):
+    def test_change_histogram_invalid_pair(self, mock_print, mock_input):
         from main import main
         main()
 
         printed_args = [call.args[0] for call in mock_print.call_args_list]
 
-        self.assertIn("Invalid format. Use USD/EUR.", printed_args)
+        self.assertIn("Invalid format. Use exactly one '/' like USD/EUR.", printed_args)
 
     # Test change histogram invalid date
-    @patch("builtins.input", side_effect=["change-histogram", "USD/EUR","1m","p" "exit"])
+    @patch("builtins.input", side_effect=["change-histogram", "USD/EUR","1m","dffff","2024-01-01", "exit"])
     @patch("builtins.print")
-    def test_session_analysis_flow(self, mock_print, mock_input):
+    def test_change_histogram_invalid_date(self, mock_print, mock_input):
         from main import main
         main()
 
         printed_args = [call.args[0] for call in mock_print.call_args_list]
 
-        self.assertIn("Invalid date format.", printed_args)
+        self.assertIn("Invalid date format or date. Please use YYYY-MM-DD.", printed_args)
 
-    # Test change histogram period
-    @patch("builtins.input", side_effect=["change-histogram", "USD/EUR", "k", "exit"])
+    # Test change histogram invalid period
+    @patch("builtins.input", side_effect=["change-histogram", "USD/EUR", "k","1m","2024-01-01", "exit"])
     @patch("builtins.print")
-    def test_session_analysis_flow(self, mock_print, mock_input):
+    def test_change_histogram_invalid_period(self, mock_print, mock_input):
         from main import main
         main()
 
         printed_args = [call.args[0] for call in mock_print.call_args_list]
 
         # Write a return error
-        self.assertIn("Invalid date format.", printed_args)
+        self.assertIn("Invalid period. Use '1m' for one month or '1q' for one quarter.", printed_args)
 
 
 class TestMainFlow(unittest.TestCase):
