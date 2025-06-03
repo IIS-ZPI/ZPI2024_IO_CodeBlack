@@ -47,6 +47,17 @@ def get_valid_currency_and_period(cm):
 
 def main():
     cm = CurrencyManager()
+
+    print(
+"""
+\tWelcome to the NBP Insight Project.
+This tool allows users to fetch and analyze 
+historical exchange rate data from the NBP API, 
+offering statistical insights and visualizations
+for informed currency trend analysis.
+
+Type help to see available commands""")
+
     while True:
         command = input("Enter command: ").strip()
 

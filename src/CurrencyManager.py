@@ -11,16 +11,16 @@ class CurrencyManager:
 
     def show_help(self):
         print("""
-        Available commands:
-        - fetch-data
-        - list-currencies
-        - help
-        - export
-        - session-analysis
-        - statistics
-        - change-histogram
-        - exit
-        """)
+    Available commands:
+    - fetch-data
+    - list-currencies
+    - help
+    - export
+    - session-analysis
+    - statistics
+    - change-histogram
+    - exit
+    """)
 
     def get_period_dates(self, period):
         today = datetime.today()
