@@ -1,9 +1,9 @@
-[build-system]
++[build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "NBP App"
+name = "nbp-app"
 description = "A Python application that fetches and analyzes currency exchange rate data from the National Bank of Poland (NBP) API, providing statistical insights and visualizations."
 version = "2.2.0"
 authors = [{name = "CodeBlack"}]
