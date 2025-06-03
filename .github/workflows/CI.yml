@@ -40,7 +40,7 @@ jobs:
         pytest
         
   release:
-    if: github.event.pull_request.base.ref == 'release' && success()
+    if: github.event.pull_request.base.ref == 'release'
     needs: build
     runs-on: ubuntu-latest
     steps:
