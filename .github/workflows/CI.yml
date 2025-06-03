@@ -65,11 +65,23 @@ jobs:
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git tag v2.${{ github.run_number }}
+          git tag v2.0.${{ github.run_number }}
           git push origin --tags
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v2.0.${{ github.run_number }}
+          release_name: Release v2.0.${{ github.run_number }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload artifact (dist files)
         uses: actions/upload-artifact@v4
         with:
           name: python-dist
           path: dist/*
+
