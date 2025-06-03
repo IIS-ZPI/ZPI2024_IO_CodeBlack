@@ -149,9 +149,10 @@ class TestCurrencyManager(unittest.TestCase):
             )
 
     # Test change histogram invalid pair
+    @patch("matplotlib.pyplot.show")
     @patch("builtins.input", side_effect=["change-histogram", "USD","USD/EUR","1m","2024-01-01", "exit"])
     @patch("builtins.print")
-    def test_change_histogram_invalid_pair(self, mock_print, mock_input):
+    def test_change_histogram_invalid_pair(self, mock_print, mock_input,mock_show):
         from main import main
         main()
 
@@ -160,9 +161,10 @@ class TestCurrencyManager(unittest.TestCase):
         self.assertIn("Invalid format. Use exactly one '/' like USD/EUR.", printed_args)
 
     # Test change histogram invalid date
+    @patch("matplotlib.pyplot.show")
     @patch("builtins.input", side_effect=["change-histogram", "USD/EUR","1m","dffff","2024-01-01", "exit"])
     @patch("builtins.print")
-    def test_change_histogram_invalid_date(self, mock_print, mock_input):
+    def test_change_histogram_invalid_date(self, mock_print, mock_input,mock_show):
         from main import main
         main()
 
@@ -171,9 +173,10 @@ class TestCurrencyManager(unittest.TestCase):
         self.assertIn("Invalid date format or date. Please use YYYY-MM-DD.", printed_args)
 
     # Test change histogram invalid period
+    @patch("matplotlib.pyplot.show")
     @patch("builtins.input", side_effect=["change-histogram", "USD/EUR", "k","1m","2024-01-01", "exit"])
     @patch("builtins.print")
-    def test_change_histogram_invalid_period(self, mock_print, mock_input):
+    def test_change_histogram_invalid_period(self, mock_print, mock_input,mock_show):
         from main import main
         main()
 
