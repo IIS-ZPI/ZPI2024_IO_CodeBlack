@@ -27,11 +27,13 @@ def get_valid_currency_pair(cm) -> tuple[str, str]:
             continue
 
         base, quote = pair.split('/')
-        if base in cm.currencies and quote in cm.currencies:
+        if base in cm.currencies and quote in cm.currencies or (base in cm.currencies and quote == 'PLN') or (
+                quote in cm.currencies and base == 'PLN'):
             return base, quote
 
-        print("Invalid currencies. Available currencies:")
+        print("Invalid currencies.")
         cm.show_available_currencies()
+
 
 def get_valid_currency_and_period(cm):
     currency = get_valid_currency(cm)
@@ -49,14 +51,14 @@ def main():
     cm = CurrencyManager()
 
     print(
-"""
-\tWelcome to the NBP Insight Project.
-This tool allows users to fetch and analyze 
-historical exchange rate data from the NBP API, 
-offering statistical insights and visualizations
-for informed currency trend analysis.
-
-Type help to see available commands""")
+        """
+        \tWelcome to the NBP Insight Project.
+        This tool allows users to fetch and analyze 
+        historical exchange rate data from the NBP API, 
+        offering statistical insights and visualizations
+        for informed currency trend analysis.
+        
+        Type help to see available commands""")
 
     while True:
         command = input("Enter command: ").strip()
@@ -122,6 +124,19 @@ Type help to see available commands""")
                 continue
             end_date = start_date + timedelta(days=30 if period == "1m" else 90)
 
+            if base == 'PLN' or quote == 'PLN':
+                dest = cm.fetch_data(base if base != 'PLN' else quote, start_date.strftime("%Y-%m-%d"),
+                                     end_date.strftime("%Y-%m-%d"))
+
+                rel_data = []
+                for i in range(len(dest)):
+                    date = dest[i][0]
+                    rate = 1 / dest[i][1] if base == 'PLN' else dest[i][1]
+                    rel_data.append((date, rate))
+
+                cm.generate_histogram(rel_data, f"{base}/{quote} Histogram")
+                continue
+
             try:
                 base_data = cm.fetch_data(base, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"))
                 quote_data = cm.fetch_data(quote, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"))
@@ -146,6 +161,7 @@ Type help to see available commands""")
 
         else:
             print("Unknown command. Type 'help' to see available commands.")
+
 
 if __name__ == "__main__":
     main()

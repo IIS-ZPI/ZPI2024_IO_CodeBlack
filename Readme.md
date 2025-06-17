@@ -2,6 +2,11 @@
 
 This project uses **GitHub Actions** to implement Continuous Integration (CI) and Continuous Deployment (CD) practices.
 
+# Fix issue 
+https://github.com/orgs/IIS-ZPI/projects/26/views/1?pane=issue&itemId=115731745&issue=IIS-ZPI%7CZPI2024_IO_CodeBlack%7C77
+
+
+
 ##  Triggering Events
 
 The pipeline runs automatically on:
