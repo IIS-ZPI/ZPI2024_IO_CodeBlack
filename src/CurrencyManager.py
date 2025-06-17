@@ -1,6 +1,7 @@
 import csv
 from statistics import median, mode, stdev
 
+import numpy as np
 import requests
 from datetime import datetime, timedelta
 from matplotlib import pyplot as plt
@@ -105,11 +106,20 @@ class CurrencyManager:
         }
 
     def generate_histogram(self, data, title="Histogram"):
-        values = [x[1] for x in data]
-        plt.hist(values, bins=10, edgecolor='black')
+        x_values = [x[0] for x in data]
+        y_values = [x[1] for x in data]
+
+        plt.plot(x_values, y_values, marker='o')
         plt.title(title)
-        plt.xlabel("Exchange Rate")
-        plt.ylabel("Frequency")
+        plt.xlabel("Date")
+        plt.ylabel(f"Value {title[0:7]}")
         plt.grid(True)
+
+        # Limit x-ticks to 5 evenly spaced values
+        num_ticks = 5
+        tick_indices = np.linspace(0, len(x_values) - 1, num_ticks, dtype=int)
+        plt.xticks([x_values[i] for i in tick_indices])
+
+        plt.tight_layout()
         plt.savefig("histogram.png")
         plt.show()
