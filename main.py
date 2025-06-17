@@ -31,7 +31,7 @@ def get_valid_currency_pair(cm) -> tuple[str, str]:
                 quote in cm.currencies and base == 'PLN'):
             return base, quote
 
-        print("Invalid currencies. Available currencies:")
+        print("Invalid currencies.")
         cm.show_available_currencies()
 
 
