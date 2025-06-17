@@ -121,5 +121,5 @@ class CurrencyManager:
         plt.xticks([x_values[i] for i in tick_indices])
 
         plt.tight_layout()
-        plt.savefig("line_plot.png")
+        plt.savefig("histogram.png")
         plt.show()
