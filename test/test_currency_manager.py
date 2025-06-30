@@ -206,7 +206,7 @@ class TestCurrencyManager(unittest.TestCase):
         data = [("2023-01-01", 4.5), ("2023-01-02", 4.6), ("2023-01-03", 4.7)]
         self.cm.generate_histogram(data, title="Test Histogram")
 
-        mock_savefig.assert_called_once_with("histogram.png")
+        mock_savefig.assert_called_once_with("change_histogram.png")
         mock_show.assert_called_once()
 
 if __name__ == '__main__':
