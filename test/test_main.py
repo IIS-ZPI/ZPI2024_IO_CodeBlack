@@ -2,10 +2,8 @@ import unittest
 import re
 from unittest.mock import patch, MagicMock
 from src.CurrencyManager import CurrencyManager
-from datetime import datetime
 
 class TestCurrencyManager(unittest.TestCase):
-
     def setUp(self):
         self.cm = CurrencyManager()
 
@@ -185,6 +183,71 @@ class TestCurrencyManager(unittest.TestCase):
         # Write a return error
         self.assertIn("Invalid period. Use '1m' for one month or '1q' for one quarter.", printed_args)
 
+    @patch("builtins.input", side_effect=["help", "exit"])
+    @patch("builtins.print")
+    @patch("src.CurrencyManager.CurrencyManager.show_help")
+    def test_main_help_command(self, mock_help, mock_print, mock_input):
+        from main import main
+        main()
+        mock_help.assert_called_once()
+
+    @patch("builtins.input", side_effect=["export", "csv", "USD", "2024-01-01", "2024-01-05", "exit"])
+    @patch("builtins.print")
+    @patch("src.CurrencyManager.CurrencyManager.export_to_csv")
+    @patch("src.CurrencyManager.CurrencyManager.fetch_data")
+    def test_export_csv(self, mock_fetch, mock_export, mock_print, mock_input):
+        mock_fetch.return_value = [("2024-01-01", 3.9), ("2024-01-02", 4.0)]
+        from main import main
+        main()
+        mock_export.assert_called_once_with(mock_fetch.return_value)
+
+    @patch("builtins.input", side_effect=["export", "xml", "exit"])
+    @patch("builtins.print")
+    def test_export_invalid_format(self, mock_print, mock_input):
+        from main import main
+        main()
+        printed_args = [call.args[0] for call in mock_print.call_args_list]
+        assert "Unsupported export format." in printed_args
+
+    @patch("builtins.input", side_effect=["statistics", "EUR", "1m", "exit"])
+    @patch("builtins.print")
+    @patch("src.CurrencyManager.CurrencyManager.compute_statistics")
+    @patch("src.CurrencyManager.CurrencyManager.fetch_data")
+    def test_main_statistics_valid_flow(self, mock_fetch, mock_stats, mock_print, mock_input):
+        mock_fetch.return_value = [("2024-01-01", 4.0), ("2024-01-02", 4.1)]
+        mock_stats.return_value = {
+            "mean": 4.05, "median": 4.05, "mode": 4.0, "std_dev": 0.05, "cv": 0.0123
+        }
+        from main import main
+        main()
+        printed = [call.args[0] for call in mock_print.call_args_list]
+        assert any("mean" in line for line in printed)
+
+    @patch("builtins.input", side_effect=["fetch-data", "USD", "2024-01-01", "2024-01-05", "exit"])
+    @patch("builtins.print")
+    @patch("src.CurrencyManager.CurrencyManager.fetch_data", side_effect=ValueError("API error"))
+    def test_fetch_data_api_error(self, mock_fetch, mock_print, mock_input):
+        from main import main
+        main()
+        printed_args = [call.args[0] for call in mock_print.call_args_list]
+        assert "Error fetching data: API error" in printed_args
+
+    @patch("builtins.input", side_effect=["list-currencies", "exit"])
+    @patch("builtins.print")
+    @patch("src.CurrencyManager.CurrencyManager.show_available_currencies")
+    def test_full_command_flow_then_exit(self, mock_show, mock_print, mock_input):
+        from main import main
+        main()
+        mock_show.assert_called_once()
+
+    @patch("builtins.input", side_effect=["fetch-data", "USD", "wrong-date", "2024-01-01", "2024-01-02", "exit"])
+    @patch("builtins.print")
+    @patch("src.CurrencyManager.CurrencyManager.fetch_data", return_value=[("2024-01-01", 4.0)])
+    def test_invalid_date_format_then_retry(self, mock_fetch, mock_print, mock_input):
+        from main import main
+        main()
+        printed_args = [call.args[0] for call in mock_print.call_args_list]
+        assert "Invalid date format or date. Please use YYYY-MM-DD." in printed_args
 
 class TestMainFlow(unittest.TestCase):
     @patch("builtins.input", side_effect=["list-currencies", "exit"])

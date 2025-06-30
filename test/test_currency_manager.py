@@ -165,6 +165,16 @@ class TestCurrencyManager(unittest.TestCase):
         self.assertIsInstance(data, list, "Expected result to be a list")
         self.assertEqual(data, [], "Expected empty list when end date is before start date")
 
+    def test_integration_fetch_data_and_statistics(self):
+        data = self.cm.fetch_data("USD", "2023-01-01", "2023-01-10")
+        stats = self.cm.compute_statistics(data)
+
+        self.assertIsInstance(stats, dict)
+        if stats:
+            self.assertIn("median", stats)
+            self.assertIn("mode", stats)
+            self.assertIn("std_dev", stats)
+            self.assertIn("cv", stats)
 
     def test_compute_statistics_typical_data(self):
         data = [("2023-01-01", 11), ("2023-01-02", 12), ("2023-01-03", 14), ("2023-01-04", 12)]
@@ -208,6 +218,81 @@ class TestCurrencyManager(unittest.TestCase):
 
         mock_savefig.assert_called_once_with("histogram.png")
         mock_show.assert_called_once()
+
+    @patch("requests.get")
+    def test_fetch_data_api_success(self, mock_get):
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {
+            "rates": [
+                {"effectiveDate": "2023-01-01", "mid": 4.5},
+                {"effectiveDate": "2023-01-02", "mid": 4.6},
+            ]
+        }
+
+        data = self.cm.fetch_data("USD", "2023-01-01", "2023-01-02")
+        self.assertEqual(data, [("2023-01-01", 4.5), ("2023-01-02", 4.6)])
+
+    @patch("requests.get")
+    @patch("builtins.print")
+    def test_fetch_data_api_failure(self, mock_print, mock_get):
+        mock_get.return_value.status_code = 404
+        mock_get.return_value.json.return_value = {}
+
+        data = self.cm.fetch_data("USD", "2023-01-01", "2023-01-02")
+
+        self.assertEqual(data, [])
+        self.assertTrue(mock_print.called)
+        self.assertIn("Error fetching data", mock_print.call_args[0][0])
+
+    @patch("requests.get")
+    def test_fetch_data_api_returns_empty(self, mock_get):
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {"rates": []}
+
+        data = self.cm.fetch_data("USD", "2023-01-01", "2023-01-02")
+        self.assertEqual(data, [], "Expected empty data list when API returns no rates")
+
+    @patch("requests.get")
+    def test_fetch_data_api_no_rates_key(self, mock_get):
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {}
+
+        data = self.cm.fetch_data("USD", "2023-01-01", "2023-01-02")
+        self.assertEqual(data, [], "Expected empty list when 'rates' key is missing")
+
+    def test_compute_statistics_multiple_modes(self):
+        data = [
+            ("2023-01-01", 5),
+            ("2023-01-02", 6),
+            ("2023-01-03", 5),
+            ("2023-01-04", 6)
+        ]
+        result = self.cm.compute_statistics(data)
+        self.assertIn(result["mode"], [5, 6], "Expected one of the multiple modes")
+
+    def test_export_to_csv_empty_data(self):
+        data = []
+        mock_file = mock_open()
+
+        with patch("builtins.open", mock_file), \
+                patch("csv.writer") as mock_writer_class, \
+                patch("builtins.print") as mock_print:
+            mock_writer = mock_writer_class.return_value
+            self.cm.export_to_csv(data, "empty.csv")
+
+            mock_writer.writerow.assert_called_once_with(["Date", "Exchange Rate"])
+            mock_writer.writerows.assert_called_once_with([])
+            mock_print.assert_called_once_with("Data exported to empty.csv")
+
+    def test_session_analysis_two_equal(self):
+        data = [("2023-01-01", 4.5), ("2023-01-02", 4.5)]
+        expected = {"up": 0, "down": 0, "stable": 1}
+        self.assertEqual(self.cm.session_analysis(data), expected)
+
+    def test_session_analysis_two_different(self):
+        data = [("2023-01-01", 4.5), ("2023-01-02", 4.8)]
+        expected = {"up": 1, "down": 0, "stable": 0}
+        self.assertEqual(self.cm.session_analysis(data), expected)
 
 if __name__ == '__main__':
     unittest.main()
