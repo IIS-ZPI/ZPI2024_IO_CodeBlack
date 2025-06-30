@@ -202,11 +202,32 @@ class TestCurrencyManager(unittest.TestCase):
         
     @patch("matplotlib.pyplot.savefig")
     @patch("matplotlib.pyplot.show")
-    def test_generate_histogram(self, mock_show, mock_savefig):
+    def test_generate_histogram_typical(self, mock_show, mock_savefig):
         data = [("2023-01-01", 4.5), ("2023-01-02", 4.6), ("2023-01-03", 4.7)]
-        self.cm.generate_histogram(data, title="Test Histogram")
+        self.cm.generate_histogram(data, title="Typical Histogram")
+        mock_savefig.assert_called_once_with("change_histogram.png")
+        mock_show.assert_called_once()
 
-        mock_savefig.assert_called_once_with("histogram.png")
+    @patch("builtins.print")
+    def test_generate_histogram_insufficient_data(self, mock_print):
+        data = [("2023-01-01", 4.5)]
+        self.cm.generate_histogram(data)
+        mock_print.assert_called_once_with("Not enough data to calculate changes.")
+
+    @patch("matplotlib.pyplot.savefig")
+    @patch("matplotlib.pyplot.show")
+    def test_generate_histogram_all_stable(self, mock_show, mock_savefig):
+        data = [("2023-01-01", 5.0), ("2023-01-02", 5.0), ("2023-01-03", 5.0)]
+        self.cm.generate_histogram(data, title="Stable Histogram")
+        mock_savefig.assert_called_once_with("change_histogram.png")
+        mock_show.assert_called_once()
+
+    @patch("matplotlib.pyplot.savefig")
+    @patch("matplotlib.pyplot.show")
+    def test_generate_histogram_mixed_changes(self, mock_show, mock_savefig):
+        data = [("2023-01-01", 4.5), ("2023-01-02", 4.7), ("2023-01-03", 4.6), ("2023-01-04", 4.8)]
+        self.cm.generate_histogram(data, title="Mixed Changes")
+        mock_savefig.assert_called_once_with("change_histogram.png")
         mock_show.assert_called_once()
 
 if __name__ == '__main__':

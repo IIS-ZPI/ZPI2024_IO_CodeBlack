@@ -106,20 +106,18 @@ class CurrencyManager:
         }
 
     def generate_histogram(self, data, title="Histogram"):
-        x_values = [x[0] for x in data]
-        y_values = [x[1] for x in data]
+        if len(data) < 2:
+            print("Not enough data to calculate changes.")
+            return
 
-        plt.plot(x_values, y_values, marker='o')
+        changes = [round(data[i][1] - data[i - 1][1], 4) for i in range(1, len(data))]
+
+        plt.hist(changes, bins=20, edgecolor='black')
         plt.title(title)
-        plt.xlabel("Date")
-        plt.ylabel(f"Value {title[0:7]}")
+        plt.xlabel("Change in Exchange Rate")
+        plt.ylabel("Frequency")
         plt.grid(True)
 
-        # Limit x-ticks to 5 evenly spaced values
-        num_ticks = 5
-        tick_indices = np.linspace(0, len(x_values) - 1, num_ticks, dtype=int)
-        plt.xticks([x_values[i] for i in tick_indices])
-
         plt.tight_layout()
-        plt.savefig("histogram.png")
+        plt.savefig("change_histogram.png")
         plt.show()

@@ -2,7 +2,6 @@ import unittest
 import re
 from unittest.mock import patch, MagicMock
 from src.CurrencyManager import CurrencyManager
-from datetime import datetime
 
 class TestCurrencyManager(unittest.TestCase):
 
@@ -185,6 +184,74 @@ class TestCurrencyManager(unittest.TestCase):
         # Write a return error
         self.assertIn("Invalid period. Use '1m' for one month or '1q' for one quarter.", printed_args)
 
+    @patch("matplotlib.pyplot.show")
+    @patch("builtins.input", side_effect=["change-histogram", "USD/EUR", "xyz", "1m", "2024-01-01", "exit"])
+    @patch("builtins.print")
+    def test_histogram_invalid_period(self, mock_print, mock_input, mock_show):
+        from main import main
+        main()
+        self.assertIn("Invalid period. Use '1m' for one month or '1q' for one quarter.",
+                      [call.args[0] for call in mock_print.call_args_list])
+
+    @patch("matplotlib.pyplot.show")
+    @patch("builtins.input", side_effect=["change-histogram", "USD/EUR", "1m", "dffff", "2024-01-01", "exit"])
+    @patch("builtins.print")
+    def test_histogram_invalid_date(self, mock_print, mock_input, mock_show):
+        from main import main
+        main()
+        self.assertIn("Invalid date format or date. Please use YYYY-MM-DD.", [call.args[0] for call in mock_print.call_args_list])
+
+    @patch("matplotlib.pyplot.show")
+    @patch("src.CurrencyManager.CurrencyManager.fetch_data", return_value=[
+        ('2024-01-01', 4.00),
+        ('2024-01-02', 4.10),
+    ])
+    @patch("builtins.input", side_effect=["change-histogram", "PLN/USD", "1m", "2024-01-01", "exit"])
+    @patch("builtins.print")
+    def test_histogram_pln_in_pair(self, mock_print, mock_input, mock_fetch, mock_show):
+        from main import main
+        main()
+        mock_fetch.assert_called_once()
+        mock_show.assert_called_once()
+
+    @patch("matplotlib.pyplot.show")
+    @patch("src.CurrencyManager.CurrencyManager.fetch_data", side_effect=[
+        [('2024-01-01', 4.0), ('2024-01-02', 4.2)],
+        [('2024-01-01', 2.0), ('2024-01-02', 2.1)],
+    ])
+    @patch("builtins.input", side_effect=["change-histogram", "USD/EUR", "1m", "2024-01-01", "exit"])
+    @patch("builtins.print")
+    def test_histogram_valid_pair(self, mock_print, mock_input, mock_fetch, mock_show):
+        from main import main
+        main()
+        self.assertEqual(mock_fetch.call_count, 2)
+        mock_show.assert_called_once()
+
+    @patch("matplotlib.pyplot.show")
+    @patch("src.CurrencyManager.CurrencyManager.fetch_data", side_effect=[
+        [('2024-01-01', 4.0), ('2024-01-02', 4.2)],
+        [('2024-01-01', 2.0)]  # mismatch
+    ])
+    @patch("builtins.input", side_effect=["change-histogram", "USD/EUR", "1m", "2024-01-01", "exit"])
+    @patch("builtins.print")
+    def test_histogram_mismatched_data_length(self, mock_print, mock_input, mock_fetch, mock_show):
+        from main import main
+        main()
+        self.assertIn("Mismatch in data length. Cannot build histogram.", [call.args[0] for call in mock_print.call_args_list])
+
+    @patch("matplotlib.pyplot.show")
+    @patch("src.CurrencyManager.CurrencyManager.fetch_data", side_effect=[
+        [('2024-01-01', 4.0), ('2024-01-02', 4.1)],
+        [('2024-01-01', 2.0), ('2024-01-02', 2.05)],
+    ])
+    @patch("builtins.input", side_effect=["change-histogram", "USD/EUR", "1m", "2024-01-01", "exit"])
+    @patch("builtins.print")
+    def test_histogram_full_valid_path(self, mock_print, mock_input, mock_fetch, mock_show):
+        from main import main
+        main()
+        self.assertEqual(mock_fetch.call_count, 2)
+        mock_show.assert_called_once()
+        self.assertIn("Exiting application.", [call.args[0] for call in mock_print.call_args_list])
 
 class TestMainFlow(unittest.TestCase):
     @patch("builtins.input", side_effect=["list-currencies", "exit"])
