@@ -5,6 +5,8 @@ import numpy as np
 import requests
 from datetime import datetime, timedelta
 from matplotlib import pyplot as plt
+from matplotlib.ticker import MaxNLocator
+
 
 class CurrencyManager:
     def __init__(self):
@@ -111,12 +113,15 @@ class CurrencyManager:
             return
 
         changes = [round(data[i][1] - data[i - 1][1], 4) for i in range(1, len(data))]
+        maximum = max(changes) if max(changes) > abs(min(changes)) else abs(min(changes))
+        bins = np.linspace(-maximum, maximum, 11)
 
-        plt.hist(changes, bins=20, edgecolor='black')
+        plt.hist(changes, bins=bins, edgecolor='black')
         plt.title(title)
         plt.xlabel("Change in Exchange Rate")
         plt.ylabel("Frequency")
-        plt.grid(True)
+        plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
+        plt.grid(False)
 
         plt.tight_layout()
         plt.savefig("change_histogram.png")
