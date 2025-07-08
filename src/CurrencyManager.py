@@ -5,6 +5,8 @@ import numpy as np
 import requests
 from datetime import datetime, timedelta
 from matplotlib import pyplot as plt
+from matplotlib.ticker import MaxNLocator
+
 
 class CurrencyManager:
     def __init__(self):
@@ -106,20 +108,21 @@ class CurrencyManager:
         }
 
     def generate_histogram(self, data, title="Histogram"):
-        x_values = [x[0] for x in data]
-        y_values = [x[1] for x in data]
+        if len(data) < 2:
+            print("Not enough data to calculate changes.")
+            return
 
-        plt.plot(x_values, y_values, marker='o')
+        changes = [round(data[i][1] - data[i - 1][1], 4) for i in range(1, len(data))]
+        maximum = max(changes) if max(changes) > abs(min(changes)) else abs(min(changes))
+        bins = np.linspace(-maximum, maximum, 11)
+
+        plt.hist(changes, bins=bins, edgecolor='black')
         plt.title(title)
-        plt.xlabel("Date")
-        plt.ylabel(f"Value {title[0:7]}")
-        plt.grid(True)
-
-        # Limit x-ticks to 5 evenly spaced values
-        num_ticks = 5
-        tick_indices = np.linspace(0, len(x_values) - 1, num_ticks, dtype=int)
-        plt.xticks([x_values[i] for i in tick_indices])
+        plt.xlabel("Change in Exchange Rate")
+        plt.ylabel("Frequency")
+        plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
+        plt.grid(False)
 
         plt.tight_layout()
-        plt.savefig("histogram.png")
+        plt.savefig("change_histogram.png")
         plt.show()
