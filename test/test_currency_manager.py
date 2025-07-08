@@ -181,8 +181,8 @@ class TestCurrencyManager(unittest.TestCase):
         result = self.cm.compute_statistics(data)
         self.assertEqual(result["median"], 12)
         self.assertEqual(result["mode"], 12)
-        self.assertGreater(result["std_dev"], 0)
-        self.assertGreater(result["cv"], 0)
+        self.assertEqual(round(result["std_dev"], 2), 1.26)
+        self.assertEqual(round(result["cv"], 2), 10.27)
 
     def test_compute_statistics_single_element(self):
         data = [("2023-01-01", 10)]
@@ -205,10 +205,10 @@ class TestCurrencyManager(unittest.TestCase):
     def test_compute_statistics_float_values(self):
         data = [("2023-01-01", 4.5), ("2023-01-02", 5.5), ("2023-01-03", 6.5)]
         result = self.cm.compute_statistics(data)
-        self.assertAlmostEqual(result["median"], 5.5)
+        self.assertEqual(result["median"], 5.5)
         self.assertEqual(result["mode"], 4.5)
-        self.assertAlmostEqual(result["std_dev"], 1.0)
-        self.assertGreater(result["cv"], 0)
+        self.assertEqual(round(result["std_dev"], 2), 1.0)
+        self.assertEqual(round(result["cv"], 2), 18.18)
         
     @patch("matplotlib.pyplot.savefig")
     @patch("matplotlib.pyplot.show")
